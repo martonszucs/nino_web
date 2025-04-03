@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '/core/services/supabase_service.dart';
+
 class MarkerModel {
   final String id;
   final LatLng position;
   final Color borderColor;
-  // final String imageUrl;
+  final String imageUrl;
   // final String number;
 
   MarkerModel({
     required this.id,
     required this.position,
     required this.borderColor,
-    // required this.imageUrl,
+    required this.imageUrl,
     // required this.number,
   });
 
-  factory MarkerModel.fromSupabase(Map<String, dynamic> data) {
+  static Future<MarkerModel> fromSupabase(Map<String, dynamic> data) async {
+    final markerId = data['id'].toString();
+    final latitude = data['coordinates']['latitude'];
+    final longitude = data['coordinates']['longitude'];
+    
     return MarkerModel(
-      id: data['id'].toString(),
-      position: LatLng(data['coordinates']['latitude'], data['coordinates']['longitude']),
+      id: markerId,
+      position: LatLng(latitude, longitude),
       borderColor: Colors.blue,
-      // imageUrl: data['image_url'],
+      imageUrl: await SupabaseService.getImageUrlFromNewsBucket(markerId),
     );
   }
 }

@@ -53,11 +53,17 @@ class MarkerController with ChangeNotifier {
   }
 
   Future<BitmapDescriptor> _createMarkerIcon(MarkerModel model) async {
-    final widget = MarkerWidget(
-      model: model,
+    final completer = Completer<ImageInfo>();
+    final image = NetworkImage(model.imageUrl);
+    image.resolve(ImageConfiguration.empty).addListener(
+      ImageStreamListener((info, _) => completer.complete(info))
     );
+
+    await completer.future.timeout(Duration(seconds: 5));
+
+    final widget = MarkerWidget(model: model);
     return await _widgetToBitmap(widget);
-  }
+}
 
   Future<BitmapDescriptor> _widgetToBitmap(Widget widget) async {
     if (_context == null) throw Exception('Context not set');

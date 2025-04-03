@@ -15,8 +15,7 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   final LocationService locationService = LocationService();
-  final MarkerController markerController = MarkerController(); 
-  final Set<Marker> _markers = {}; 
+  final MarkerController markerController = MarkerController();
 
   late GoogleMapController googleMapController;
 
