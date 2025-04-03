@@ -15,4 +15,13 @@ class MarkerModel {
     // required this.imageUrl,
     // required this.number,
   });
+
+  factory MarkerModel.fromSupabase(Map<String, dynamic> data) {
+    return MarkerModel(
+      id: data['id'].toString(),
+      position: LatLng(data['coordinates']['latitude'], data['coordinates']['longitude']),
+      borderColor: Colors.blue,
+      // imageUrl: data['image_url'],
+    );
+  }
 }

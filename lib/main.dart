@@ -1,14 +1,22 @@
 import 'dart:js_interop';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'views/map_view.dart';
 
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? 'YOUR_DEFAULT_API_KEY';
-
+  final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
   setGoogleMapsApiKey(apiKey);
+
+  final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? "";
+  final supabaseKey = dotenv.env['SUPABASE_API_KEY'] ?? "";
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseKey,
+  );
 
   runApp(MyApp());
 }

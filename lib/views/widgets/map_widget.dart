@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nino_web/models/marker_model.dart';
-
 import '/core/services/location_service.dart';
 import '/core/constants/constants.dart';
 import '/views/widgets/side_panel_widget.dart';
@@ -55,27 +53,10 @@ class _MapWidgetState extends State<MapWidget> {
 
   Future<void> _initializeMarkers(BuildContext context) async {
     markerController.setContext(context);
-    
-    final exampleMarkers = [
-      MarkerModel(
-        id: '1',
-        position: LatLng(37.7749, -122.4194),
-        borderColor: Colors.blue,
-      ),
-    ];
-
-    for (var markerData in exampleMarkers) {
-      final marker = await markerController.createMarker(
-        markerData.id,
-        markerData.position,
-        markerData.borderColor,
-        "assets/images/protest.jpg"
-      );
-      setState(() => _markers.add(marker));
-    }
+    markerController.initMarkerStream();
   }
 
-  void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(GoogleMapController controller) async {
     googleMapController = controller;
   }
 
@@ -83,6 +64,13 @@ class _MapWidgetState extends State<MapWidget> {
     setState(() {
       _showSidePanel = !_showSidePanel;
     });
+  }
+
+  @override
+  void dispose() {
+    markerController.dispose();
+    googleMapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -98,7 +86,7 @@ class _MapWidgetState extends State<MapWidget> {
                     target: _center!,
                     zoom: 11.0,
                   ),
-                  markers: _markers
+                  markers: markerController.markers
                 ),
                 if (_showSidePanel)
                   SidePanel(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/marker_model.dart';
 
 class MarkerWidget extends StatelessWidget {
-  final String assetImagePath;
+  // final String assetImagePath;
   final double width;
   final double height;
   final MarkerModel model;
@@ -10,7 +10,7 @@ class MarkerWidget extends StatelessWidget {
   const MarkerWidget({
     super.key,
     required this.model,
-    required this.assetImagePath,
+    // required this.assetImagePath,
     this.width = 60,
     this.height = 80,
   });
