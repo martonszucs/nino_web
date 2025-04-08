@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:nino_web/models/category.dart';
 
 import '../../models/marker_model.dart';
 
@@ -26,7 +26,7 @@ class MarkerWidget extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: model.borderColor, width: 2),
+        border: Border.all(color: model.category.color, width: 2),
       ),
     );
   }
