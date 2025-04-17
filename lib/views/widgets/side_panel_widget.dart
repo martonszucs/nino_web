@@ -40,15 +40,12 @@ class SidePanel extends StatelessWidget {
           children: [
             LayoutBuilder(
               builder: (context, constraints) {
-                return Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  runSpacing: 8,
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.6),
+                    Expanded(
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.asset(
                             'assets/icons/nino.png',
@@ -57,30 +54,37 @@ class SidePanel extends StatelessWidget {
                           ),
                           SizedBox(width: 8),
                           Expanded(
-                            child: Text(
-                              "Nino! News Map",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent,
-                                fontFamily: 'ChakraPetch',
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Nino! News Map",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
+                                  fontFamily: 'ChakraPetch',
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Wrap(
-                      spacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _LinkText("Terms"),
-                        Text("·", style: TextStyle(color: Colors.grey)),
-                        _LinkText("Privacy"),
-                        Text("·", style: TextStyle(color: Colors.grey)),
-                        _LinkText("Download"),
-                      ],
+                    SizedBox(width: 8),
+                    Flexible(
+                      child: Wrap(
+                        spacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        alignment: WrapAlignment.end,
+                        children: [
+                          _LinkText("Terms"),
+                          Text("·", style: TextStyle(color: Colors.grey)),
+                          _LinkText("Privacy"),
+                          Text("·", style: TextStyle(color: Colors.grey)),
+                          _LinkText("Download"),
+                        ],
+                      ),
                     ),
                   ],
                 );
