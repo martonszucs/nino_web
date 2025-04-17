@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '/core/services/location_service.dart';
 import '/core/constants/constants.dart';
 import '/views/widgets/side_panel_widget.dart';
-import '../../controllers/marker_controller.dart';
+import '/controllers/marker_controller.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({super.key});
@@ -19,16 +20,18 @@ class _MapWidgetState extends State<MapWidget> {
 
   late GoogleMapController googleMapController;
 
+  String? mapStyle;
   LatLng? _center;
   bool _isLoading = true;
-  bool _showSidePanel = false;
 
   @override
   void initState() {
     super.initState();
     _fetchLocation();
+    _loadMapStyle();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeMarkers(context);
+      markerController.setContext(context);
+      markerController.initMarkerStream();
     });
   }
 
@@ -50,19 +53,13 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-  Future<void> _initializeMarkers(BuildContext context) async {
-    markerController.setContext(context);
-    markerController.initMarkerStream();
+  Future<void> _loadMapStyle() async {
+    mapStyle = await rootBundle.loadString('assets/styles/map_style.json');
+    if (mounted) setState(() {});
   }
 
-  void _onMapCreated(GoogleMapController controller) async {
+  void _onMapCreated(GoogleMapController controller) {
     googleMapController = controller;
-  }
-
-  void _toggleSidePanel() {
-    setState(() {
-      _showSidePanel = !_showSidePanel;
-    });
   }
 
   @override
@@ -74,39 +71,70 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center!,
-                    zoom: 11.0,
-                  ),
-                  markers: markerController.markers
-                ),
-                if (_showSidePanel)
-                  SidePanel(
-                    isDesktop: MediaQuery.of(context).size.width >= 600,
-                  ),
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: FloatingActionButton(
-                    onPressed: _toggleSidePanel,
-                    backgroundColor: Colors.blueAccent,
-                    child: Icon(
-                      _showSidePanel
-                          ? Icons.close
-                          : Icons.view_carousel_rounded,
-                      color: Colors.white,
+    return AnimatedBuilder(
+      animation: markerController,
+      builder: (context, _) {
+        return Scaffold(
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    GoogleMap(
+                      style: mapStyle,
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: _center!,
+                        zoom: 11.0,
+                      ),
+                      markers: markerController.markers,
+                      onTap: (_) => markerController.closeSidePanel(),
                     ),
-                  ),
+                    if (markerController.showSidePanel &&
+                        markerController.selectedMarker != null)
+                      SidePanel(
+                        isDesktop: MediaQuery.of(context).size.width >= 600,
+                        selectedMarker: markerController.selectedMarker!,
+                      ),
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          if (markerController.showSidePanel) {
+                            markerController.closeSidePanel();
+                          }
+                        },
+                        backgroundColor: markerController.showSidePanel ? Colors.red : Colors.blue,
+                        child: Icon(
+                          markerController.showSidePanel
+                              ? Icons.close
+                              : Icons.view_carousel_rounded,
+                          color: Colors.white,
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 80,
+                      right: 20,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          if (markerController.showSidePanel) {
+                            markerController.closeSidePanel();
+                          }
+                        },
+                        backgroundColor: Colors.deepPurpleAccent,
+                        child: Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.white,
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+        );
+      },
     );
   }
 }

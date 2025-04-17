@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './widgets/map_widget.dart';
+import '/views/widgets/map_widget.dart';
 
 
 

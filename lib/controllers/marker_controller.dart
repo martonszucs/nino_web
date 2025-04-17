@@ -3,15 +3,18 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../models/marker_model.dart';
-import '../views/widgets/marker_widget.dart';
+import '/models/marker_model.dart';
+import '/views/widgets/marker_widget.dart';
 import '/core/services/supabase_service.dart';
 
 class MarkerController with ChangeNotifier {
   BuildContext? _context;
+  MarkerModel? selectedMarker;
   StreamSubscription<List<MarkerModel>>? _markerSubscription;
   final Map<String, Marker> _markers = {}; // Track markers by ID
   final Map<String, BitmapDescriptor> _cachedIcons = {};
+
+  bool showSidePanel = false;
 
   void setContext(BuildContext context) {
     _context = context;
@@ -43,7 +46,7 @@ class MarkerController with ChangeNotifier {
         markerId: MarkerId(model.id),
         position: model.position,
         icon: _cachedIcons[model.id]!,
-        onTap: () => _handleMarkerTap(model),
+        onTap: () => handleMarkerTap(model),
       );
     }
     
@@ -63,7 +66,7 @@ class MarkerController with ChangeNotifier {
 
     final widget = MarkerWidget(model: model);
     return await _widgetToBitmap(widget);
-}
+  }
 
   Future<BitmapDescriptor> _widgetToBitmap(Widget widget) async {
     if (_context == null) throw Exception('Context not set');
@@ -91,8 +94,16 @@ class MarkerController with ChangeNotifier {
     return BitmapDescriptor.bytes(uint8List!);
   }
 
-  void _handleMarkerTap(MarkerModel model) {
+  void handleMarkerTap(MarkerModel model) {
     debugPrint('Marker tapped: ${model.id}');
+    selectedMarker = model;
+    showSidePanel = true;
+    notifyListeners();
+  }
+
+  void closeSidePanel() {
+    showSidePanel = false;
+    notifyListeners();
   }
 
   Set<Marker> get markers => _markers.values.toSet();

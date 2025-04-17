@@ -37,6 +37,14 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/protest.jpg
+    - assets/icons/nino.png
+    - assets/styles/map_style.json
     - .env
-    
+  
+  fonts:
+    - family: ChakraPetch
+      fonts:
+        - asset: assets/fonts/ChakraPetch-Regular.ttf
+        - asset: assets/fonts/ChakraPetch-Bold.ttf
+          weight: 700
+          
