@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '/core/services/location_service.dart';
 import '/core/constants/constants.dart';
-import '/views/widgets/side_panel_widget.dart';
+import 'side_panel/side_panel_widget.dart';
 import '/controllers/marker_controller.dart';
 
 class MapWidget extends StatefulWidget {
