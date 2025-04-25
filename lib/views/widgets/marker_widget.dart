@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nino_web/models/category.dart';
 
-import '../../models/marker_model.dart';
+import '/models/marker_model.dart';
+import '/core/constants/constants.dart';
 
 class MarkerWidget extends StatelessWidget {
   final MarkerModel model;
@@ -11,22 +12,22 @@ class MarkerWidget extends StatelessWidget {
   const MarkerWidget({
     super.key,
     required this.model,
-    this.width = 60,
-    this.height = 80,
+    this.width = MarkerConstants.markerWidth,
+    this.height = MarkerConstants.markerHeight,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
-      height: 80,
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: NetworkImage(model.imageUrl),
           fit: BoxFit.cover,
         ),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: model.category.color, width: 2),
+        borderRadius: BorderRadius.circular(MarkerConstants.markerBorderRadius),
+        border: Border.all(color: model.category.color, width: MarkerConstants.markerBorderWidth),
       ),
     );
   }
