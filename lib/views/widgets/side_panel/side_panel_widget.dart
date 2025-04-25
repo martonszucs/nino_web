@@ -44,7 +44,32 @@ class SidePanel extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final shouldWrapLinks = constraints.maxWidth < 400;
-                if (shouldWrapLinks) {
+                if (!isDesktop) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/nino.png',
+                        height: 32,
+                        width: 32,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "Nino!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                          fontFamily: 'ChakraPetch',
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: LinkRow(alignment: Alignment.centerLeft),
+                      ),
+                    ],
+                  );
+                } else if (shouldWrapLinks) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
