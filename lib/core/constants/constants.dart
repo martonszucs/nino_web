@@ -12,3 +12,9 @@ class MarkerConstants {
   static const double markerBorderWidth = 2;
   static const double markerBorderRadius = 8;
 }
+
+class LinkConstants {
+  static const String termsUrl = "https://nino.notion.site/Terms-of-Services-1f7c77c5c8ad80ec8dadef6b8c9f8e23";
+  static const String privacyUrl = "https://nino.notion.site/Privacy-Policy-1f7c77c5c8ad807fae95e225814208d5";
+  // static const String downloadUrl = "https://example.com/download";
+}

@@ -6,6 +6,7 @@ import '/core/services/location_service.dart';
 import '/core/constants/constants.dart';
 import 'side_panel/side_panel_widget.dart';
 import '/controllers/marker_controller.dart';
+import '/controllers/side_panel_controller.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({super.key});
@@ -16,7 +17,8 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   final LocationService locationService = LocationService();
-  final MarkerController markerController = MarkerController();
+  final SidePanelController sidePanelController = SidePanelController();
+  late final MarkerController markerController;
 
   late GoogleMapController googleMapController;
 
@@ -27,6 +29,7 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
+    markerController = MarkerController(sidePanelController);
     _fetchLocation();
     _loadMapStyle();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -72,7 +75,7 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: markerController,
+      animation: sidePanelController,
       builder: (context, _) {
         return Scaffold(
           body: _isLoading
@@ -87,50 +90,32 @@ class _MapWidgetState extends State<MapWidget> {
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
-                      onTap: (_) => markerController.closeSidePanel(),
+                      onTap: (_) => sidePanelController.closePanel(),
                     ),
-                    if (markerController.showSidePanel &&
-                        markerController.selectedMarker != null)
+                    if (sidePanelController.isOpen && sidePanelController.model != null)
                       SidePanel(
+                        model: sidePanelController.model!,
                         isDesktop: MediaQuery.of(context).size.width >= 600,
-                        selectedMarker: markerController.selectedMarker!,
                       ),
                     Positioned(
                       top: 20,
                       right: 20,
                       child: FloatingActionButton(
                         onPressed: () {
-                          if (markerController.showSidePanel) {
-                            markerController.closeSidePanel();
+                          if (sidePanelController.isOpen) {
+                            sidePanelController.closePanel();
                           }
                         },
-                        backgroundColor: markerController.showSidePanel ? Colors.red : Colors.blue,
+                        backgroundColor: sidePanelController.isOpen ? Colors.red : Colors.blue,
                         child: Icon(
-                          markerController.showSidePanel
+                          sidePanelController.isOpen
                               ? Icons.close
                               : Icons.view_carousel_rounded,
                           color: Colors.white,
                           size: 50,
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: 80,
-                      right: 20,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          if (markerController.showSidePanel) {
-                            markerController.closeSidePanel();
-                          }
-                        },
-                        backgroundColor: Colors.deepPurpleAccent,
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ),
+                    )
                   ],
                 ),
         );

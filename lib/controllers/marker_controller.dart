@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '/models/marker_model.dart';
 import '/views/widgets/marker_widget.dart';
 import '/core/services/supabase_service.dart';
+import '/controllers/side_panel_controller.dart';
 
 class MarkerController with ChangeNotifier {
   BuildContext? _context;
@@ -14,7 +15,11 @@ class MarkerController with ChangeNotifier {
   final Map<String, Marker> _markers = {}; // Track markers by ID
   final Map<String, BitmapDescriptor> _cachedIcons = {};
 
+  final SidePanelController sidePanelController;
+
   bool showSidePanel = false;
+
+  MarkerController(this.sidePanelController);
 
   void setContext(BuildContext context) {
     _context = context;
@@ -96,9 +101,7 @@ class MarkerController with ChangeNotifier {
 
   void handleMarkerTap(MarkerModel model) {
     debugPrint('Marker tapped: ${model.id}');
-    selectedMarker = model;
-    showSidePanel = true;
-    notifyListeners();
+    sidePanelController.showSingleMarker(model);
   }
 
   void closeSidePanel() {

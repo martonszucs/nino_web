@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:web/web.dart' as web;
+
+import '/core/constants/constants.dart';
 
 class LinkRow extends StatelessWidget {
   final Alignment alignment;
@@ -13,11 +16,20 @@ class LinkRow extends StatelessWidget {
         spacing: 4,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          LinkText("Terms"),
+          LinkText(
+            label: "Terms",
+            onTap: () => web.window.open(LinkConstants.termsUrl, '_blank'),
+          ),
           Text("·", style: TextStyle(color: Colors.grey)),
-          LinkText("Privacy"),
+          LinkText(
+            label: "Privacy",
+            onTap: () => web.window.open(LinkConstants.privacyUrl, '_blank'),
+          ),
           Text("·", style: TextStyle(color: Colors.grey)),
-          LinkText("Download"),
+          LinkText(
+            label: "Download",
+            onTap: () => web.window.open("itms-apps://itunes.apple.com/app/id6741679347", "_blank"),
+          ),
         ],
       ),
     );
@@ -26,15 +38,14 @@ class LinkRow extends StatelessWidget {
 
 class LinkText extends StatelessWidget {
   final String label;
+  final VoidCallback onTap;
 
-  const LinkText(this.label, {super.key});
+  const LinkText({super.key, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Implement link navigation logic here if needed
-      },
+      onTap: onTap,
       child: Text(
         label,
         style: TextStyle(
