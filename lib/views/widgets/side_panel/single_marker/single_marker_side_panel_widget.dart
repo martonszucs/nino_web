@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:nino_web/models/marker_model.dart';
-import 'package:nino_web/views/widgets/side_panel/header_row_widget.dart';
-import 'package:nino_web/views/widgets/side_panel/link_row_widget.dart';
+import 'package:nino_web/views/widgets/side_panel/single_marker/header_row_widget.dart';
+import 'package:nino_web/views/widgets/side_panel/single_marker/link_row_widget.dart';
 
 class SingleMarkerSidePanel extends StatelessWidget {
   final bool isDesktop;

@@ -90,7 +90,6 @@ class _MapWidgetState extends State<MapWidget> {
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
-                      onTap: (_) => sidePanelController.closePanel(),
                     ),
                     if (sidePanelController.isOpen && sidePanelController.model != null)
                       SidePanel(
