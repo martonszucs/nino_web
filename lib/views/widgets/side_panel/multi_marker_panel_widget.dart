@@ -16,55 +16,98 @@ class MultiMarkerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
     return Container(
-      width: isDesktop ? 400 : MediaQuery.of(context).size.width * 0.8,
-      height: MediaQuery.of(context).size.height,
+      width: isDesktop ? screenWidth * 0.33 : screenWidth - 40,
+      height: screenHeight * 0.85,
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 10,
-            offset: Offset(0, 2),
+            offset: Offset(0, 4),
           ),
         ],
       ),
+      padding: EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Recent Activity',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: markers.length,
-              itemBuilder: (context, index) {
-                final marker = markers[index];
-                return ListTile(
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(marker.imageUrl),
-                        fit: BoxFit.cover,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/nino.png',
+                    height: 32,
+                    width: 32,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Recent Activity",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                        fontFamily: 'ChakraPetch',
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: marker.category.color,
-                        width: 2,
-                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  title: Text('${marker.category.toString().split('.').last} - ${marker.timestamp}'),
-                  subtitle: Text(marker.authorId),
-                  onTap: () => onMarkerSelected(marker),
+                ],
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount;
+                if (isDesktop && constraints.maxWidth >= 600) {
+                  crossAxisCount = 3;
+                } else if (constraints.maxWidth >= 400) {
+                  crossAxisCount = 2;
+                } else {
+                  crossAxisCount = 1;
+                }
+
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.8,
+                  ),
+                  itemCount: markers.length,
+                  itemBuilder: (context, index) {
+                    final marker = markers[index];
+                    return InkWell(
+                      onTap: () => onMarkerSelected(marker),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: marker.category.color,
+                            width: 3,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.network(
+                            marker.imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

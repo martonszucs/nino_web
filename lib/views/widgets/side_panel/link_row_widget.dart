@@ -27,7 +27,7 @@ class LinkRow extends StatelessWidget {
           ),
           Text("·", style: TextStyle(color: Colors.grey)),
           LinkText(
-            label: "Download",
+            label: "Get App",
             onTap: () => web.window.open(LinkConstants.downloadUrl, "_blank"),
           ),
         ],
