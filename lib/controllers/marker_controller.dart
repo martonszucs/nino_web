@@ -91,12 +91,12 @@ class MarkerController with ChangeNotifier {
             key: key,
             child: SizedBox(
               // Reduce the size for the actual marker bitmap
-              width: MarkerConstants.markerWidth / 2,
-              height: MarkerConstants.markerHeight / 2,
+              width: MarkerConstants.markerWidth,
+              height: MarkerConstants.markerHeight,
               child: MarkerWidget(
                 model: model,
-                width: MarkerConstants.markerWidth / 2,
-                height: MarkerConstants.markerHeight / 2,
+                width: MarkerConstants.markerWidth,
+                height: MarkerConstants.markerHeight,
               ),
             ),
           ),
