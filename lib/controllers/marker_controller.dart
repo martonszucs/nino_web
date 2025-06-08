@@ -17,7 +17,18 @@ class MarkerController with ChangeNotifier {
 
   bool showSidePanel = false;
   bool showMultiMarkerPanel = false;
+  bool _isInteractingWithUI = false;
   List<MarkerModel> allMarkers = [];
+
+  bool get isInteractingWithUI => _isInteractingWithUI;
+
+  // Notify when starting UI interaction
+  void startUIInteraction() {
+    _isInteractingWithUI = true;
+    Future.delayed(Duration(milliseconds: 50), () {
+      _isInteractingWithUI = false;
+    });
+  }
 
   void setContext(BuildContext context) {
     _context = context;
@@ -147,6 +158,7 @@ class MarkerController with ChangeNotifier {
 
 
   void handleMarkerTap(MarkerModel model) {
+    startUIInteraction();
     debugPrint('Marker tapped: ${model.id}');
     selectedMarker = model;
     showSidePanel = true;
@@ -155,20 +167,24 @@ class MarkerController with ChangeNotifier {
   }
 
   void toggleMultiMarkerPanel() {
+    startUIInteraction();
     if (showSidePanel) {
-      closeSidePanel();
+      selectedMarker = null;
+      showSidePanel = false;
     }
     showMultiMarkerPanel = !showMultiMarkerPanel;
     notifyListeners();
   }
 
   void closeSidePanel() {
+    startUIInteraction();
     selectedMarker = null;
     showSidePanel = false;
     notifyListeners();
   }
 
   void closeMultiMarkerPanel() {
+    startUIInteraction();
     showMultiMarkerPanel = false;
     notifyListeners();
   }

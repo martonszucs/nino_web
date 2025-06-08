@@ -80,17 +80,20 @@ class _MapWidgetState extends State<MapWidget> {
               ? Center(child: CircularProgressIndicator())
               : Stack(
                   children: [
-                    GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      initialCameraPosition: CameraPosition(
-                        target: _center!,
-                        zoom: 11.0,
+                    AbsorbPointer(
+                      absorbing: markerController.showSidePanel || markerController.showMultiMarkerPanel,
+                      child: GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: _center!,
+                          zoom: 11.0,
+                        ),
+                        markers: markerController.markers,
+                        onTap: (_) {
+                          markerController.closeSidePanel();
+                          markerController.closeMultiMarkerPanel();
+                        },
                       ),
-                      markers: markerController.markers,
-                      onTap: (_) {
-                        markerController.closeSidePanel();
-                        markerController.closeMultiMarkerPanel();
-                      },
                     ),
                     if (markerController.showSidePanel &&
                         markerController.selectedMarker != null)
@@ -98,9 +101,13 @@ class _MapWidgetState extends State<MapWidget> {
                         top: 20,
                         left: 20,
                         right: MediaQuery.of(context).size.width >= 600 ? null : 20,
-                        child: SidePanel(
-                          isDesktop: MediaQuery.of(context).size.width >= 600,
-                          selectedMarker: markerController.selectedMarker!,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTapDown: (_) => markerController.startUIInteraction(),
+                          child: SidePanel(
+                            isDesktop: MediaQuery.of(context).size.width >= 600,
+                            selectedMarker: markerController.selectedMarker!,
+                          ),
                         ),
                       ),
                     if (markerController.showMultiMarkerPanel)
@@ -108,28 +115,38 @@ class _MapWidgetState extends State<MapWidget> {
                         top: 20,
                         left: 20,
                         right: MediaQuery.of(context).size.width >= 600 ? null : 20,
-                        child: MultiMarkerPanel(
-                          isDesktop: MediaQuery.of(context).size.width >= 600,
-                          markers: markerController.allMarkers,
-                          onMarkerSelected: (marker) {
-                            markerController.handleMarkerTap(marker);
-                          },
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTapDown: (_) => markerController.startUIInteraction(),
+                          onTap: () => markerController.startUIInteraction(),
+                          child: MultiMarkerPanel(
+                            isDesktop: MediaQuery.of(context).size.width >= 600,
+                            markers: markerController.allMarkers,
+                            onMarkerSelected: (marker) {
+                              markerController.handleMarkerTap(marker);
+                            },
+                          ),
                         ),
                       ),
                     Positioned(
                       top: 20,
                       right: 20,
-                      child: FloatingActionButton(
-                        onPressed: () => markerController.toggleMultiMarkerPanel(),
-                        backgroundColor: markerController.showMultiMarkerPanel || markerController.showSidePanel
-                            ? Colors.red
-                            : Colors.blue,
-                        child: Icon(
-                          markerController.showMultiMarkerPanel || markerController.showSidePanel
-                              ? Icons.close
-                              : Icons.view_list,
-                          color: Colors.white,
-                          size: 50,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapDown: (_) => markerController.startUIInteraction(),
+                        onTap: () => markerController.startUIInteraction(),
+                        child: FloatingActionButton(
+                          onPressed: () => markerController.toggleMultiMarkerPanel(),
+                          backgroundColor: markerController.showMultiMarkerPanel || markerController.showSidePanel
+                              ? Colors.red
+                              : Colors.blue,
+                          child: Icon(
+                            markerController.showMultiMarkerPanel || markerController.showSidePanel
+                                ? Icons.close
+                                : Icons.view_list,
+                            color: Colors.white,
+                            size: 50,
+                          ),
                         ),
                       ),
                     )

@@ -6,8 +6,8 @@ class LocationConstants {
 }
 
 class MarkerConstants {
-  static const double markerWidth = 72;
-  static const double markerHeight = 128;
+  static const double markerWidth = 36;
+  static const double markerHeight = 64;
 
   static const double markerBorderWidth = 2;
   static const double markerBorderRadius = 8;
