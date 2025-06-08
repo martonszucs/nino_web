@@ -168,11 +168,15 @@ class MarkerController with ChangeNotifier {
 
   void toggleMultiMarkerPanel() {
     startUIInteraction();
-    if (showSidePanel) {
+    if (showSidePanel || showMultiMarkerPanel) {
+      // If any panel is open, close everything
       selectedMarker = null;
       showSidePanel = false;
+      showMultiMarkerPanel = false;
+    } else {
+      // If no panel is open, show multi marker panel
+      showMultiMarkerPanel = true;
     }
-    showMultiMarkerPanel = !showMultiMarkerPanel;
     notifyListeners();
   }
 
@@ -187,6 +191,22 @@ class MarkerController with ChangeNotifier {
     startUIInteraction();
     showMultiMarkerPanel = false;
     notifyListeners();
+  }
+
+  bool _isMapTap = false;
+
+  void handleMapTap() {
+    if (_isMapTap || _isInteractingWithUI) return;
+    _isMapTap = true;
+    
+    // Add delay to prevent immediate closing when interacting with panels
+    Future.delayed(Duration(milliseconds: 50), () {
+      if (!_isInteractingWithUI) {
+        closeSidePanel();
+        closeMultiMarkerPanel();
+      }
+      _isMapTap = false;
+    });
   }
 
   Set<Marker> get markers => _markers.values.toSet();

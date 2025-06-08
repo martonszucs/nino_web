@@ -80,20 +80,14 @@ class _MapWidgetState extends State<MapWidget> {
               ? Center(child: CircularProgressIndicator())
               : Stack(
                   children: [
-                    AbsorbPointer(
-                      absorbing: markerController.showSidePanel || markerController.showMultiMarkerPanel,
-                      child: GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(
-                          target: _center!,
-                          zoom: 11.0,
-                        ),
-                        markers: markerController.markers,
-                        onTap: (_) {
-                          markerController.closeSidePanel();
-                          markerController.closeMultiMarkerPanel();
-                        },
+                    GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: _center!,
+                        zoom: 11.0,
                       ),
+                      markers: markerController.markers,
+                      onTap: (_) => markerController.handleMapTap(),
                     ),
                     if (markerController.showSidePanel &&
                         markerController.selectedMarker != null)
@@ -104,6 +98,7 @@ class _MapWidgetState extends State<MapWidget> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTapDown: (_) => markerController.startUIInteraction(),
+                          onTap: () => markerController.startUIInteraction(),
                           child: SidePanel(
                             isDesktop: MediaQuery.of(context).size.width >= 600,
                             selectedMarker: markerController.selectedMarker!,
