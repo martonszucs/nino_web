@@ -87,6 +87,7 @@ class _MapWidgetState extends State<MapWidget> {
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
+                      zoomGesturesEnabled: !(markerController.showSidePanel || markerController.showMultiMarkerPanel),
                       onTap: (_) => markerController.handleMapTap(),
                     ),
                     if (markerController.showSidePanel &&
