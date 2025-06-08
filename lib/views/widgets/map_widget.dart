@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '/core/services/location_service.dart';
 import '/core/constants/constants.dart';
 import 'side_panel/side_panel_widget.dart';
+import 'side_panel/multi_marker_panel_widget.dart';
 import '/controllers/marker_controller.dart';
 
 class MapWidget extends StatefulWidget {
@@ -80,57 +81,58 @@ class _MapWidgetState extends State<MapWidget> {
               : Stack(
                   children: [
                     GoogleMap(
-                      style: mapStyle,
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
                         target: _center!,
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
-                      onTap: (_) => markerController.closeSidePanel(),
+                      onTap: (_) {
+                        markerController.closeSidePanel();
+                        markerController.closeMultiMarkerPanel();
+                      },
                     ),
                     if (markerController.showSidePanel &&
                         markerController.selectedMarker != null)
-                      SidePanel(
-                        isDesktop: MediaQuery.of(context).size.width >= 600,
-                        selectedMarker: markerController.selectedMarker!,
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        right: MediaQuery.of(context).size.width >= 600 ? null : 20,
+                        child: SidePanel(
+                          isDesktop: MediaQuery.of(context).size.width >= 600,
+                          selectedMarker: markerController.selectedMarker!,
+                        ),
+                      ),
+                    if (markerController.showMultiMarkerPanel)
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        right: MediaQuery.of(context).size.width >= 600 ? null : 20,
+                        child: MultiMarkerPanel(
+                          isDesktop: MediaQuery.of(context).size.width >= 600,
+                          markers: markerController.allMarkers,
+                          onMarkerSelected: (marker) {
+                            markerController.handleMarkerTap(marker);
+                          },
+                        ),
                       ),
                     Positioned(
                       top: 20,
                       right: 20,
                       child: FloatingActionButton(
-                        onPressed: () {
-                          if (markerController.showSidePanel) {
-                            markerController.closeSidePanel();
-                          }
-                        },
-                        backgroundColor: markerController.showSidePanel ? Colors.red : Colors.blue,
+                        onPressed: () => markerController.toggleMultiMarkerPanel(),
+                        backgroundColor: markerController.showMultiMarkerPanel || markerController.showSidePanel
+                            ? Colors.red
+                            : Colors.blue,
                         child: Icon(
-                          markerController.showSidePanel
+                          markerController.showMultiMarkerPanel || markerController.showSidePanel
                               ? Icons.close
-                              : Icons.view_carousel_rounded,
+                              : Icons.view_list,
                           color: Colors.white,
                           size: 50,
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: 80,
-                      right: 20,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          if (markerController.showSidePanel) {
-                            markerController.closeSidePanel();
-                          }
-                        },
-                        backgroundColor: Colors.deepPurpleAccent,
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ),
+                    )
                   ],
                 ),
         );

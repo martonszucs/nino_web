@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '/models/marker_model.dart';
 import '/views/widgets/marker_widget.dart';
 import '/core/services/supabase_service.dart';
+import '/core/constants/constants.dart';
 
 class MarkerController with ChangeNotifier {
   BuildContext? _context;
@@ -15,6 +16,8 @@ class MarkerController with ChangeNotifier {
   final Map<String, BitmapDescriptor> _cachedIcons = {};
 
   bool showSidePanel = false;
+  bool showMultiMarkerPanel = false;
+  List<MarkerModel> allMarkers = [];
 
   void setContext(BuildContext context) {
     _context = context;
@@ -35,6 +38,7 @@ class MarkerController with ChangeNotifier {
   }
 
   Future<void> _processNewMarkers(List<MarkerModel> models) async {
+    allMarkers = models; // Store all markers
     final newMarkers = <String, Marker>{};
     
     for (final model in models) {
@@ -56,53 +60,116 @@ class MarkerController with ChangeNotifier {
   }
 
   Future<BitmapDescriptor> _createMarkerIcon(MarkerModel model) async {
+    // First ensure the image is loaded
     final completer = Completer<ImageInfo>();
     final image = NetworkImage(model.imageUrl);
     image.resolve(ImageConfiguration.empty).addListener(
       ImageStreamListener((info, _) => completer.complete(info))
     );
 
-    await completer.future.timeout(Duration(seconds: 5));
+    try {
+      await completer.future.timeout(Duration(seconds: 5));
+    } catch (e) {
+      debugPrint('Error loading marker image: $e');
+      return BitmapDescriptor.defaultMarker;
+    }
 
-    final widget = MarkerWidget(model: model);
-    return await _widgetToBitmap(widget);
-  }
-
-  Future<BitmapDescriptor> _widgetToBitmap(Widget widget) async {
-    if (_context == null) throw Exception('Context not set');
+    if (_context == null) {
+      debugPrint('Context not available for marker creation');
+      return BitmapDescriptor.defaultMarker;
+    }
     
+    // Create a new overlay entry
     final key = GlobalKey();
     final overlay = OverlayEntry(
       builder: (_) => Positioned(
-        left: -1000, 
-        child: RepaintBoundary(
-          key: key, 
-          child: widget,
+        left: -1000,
+        top: -1000,
+        child: Material(
+          type: MaterialType.transparency,
+          child: RepaintBoundary(
+            key: key,
+            child: SizedBox(
+              // Reduce the size for the actual marker bitmap
+              width: MarkerConstants.markerWidth / 2,
+              height: MarkerConstants.markerHeight / 2,
+              child: MarkerWidget(
+                model: model,
+                width: MarkerConstants.markerWidth / 2,
+                height: MarkerConstants.markerHeight / 2,
+              ),
+            ),
+          ),
         ),
       ),
     );
 
-    Navigator.of(_context!).overlay?.insert(overlay);
-    await Future.delayed(const Duration(milliseconds: 50));
+    try {
+      final navigator = Navigator.of(_context!);
+      if (navigator.overlay == null) {
+        debugPrint('Overlay not available for marker creation');
+        return BitmapDescriptor.defaultMarker;
+      }
 
-    final boundary = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-    final image = await boundary?.toImage();
-    final byteData = await image?.toByteData(format: ui.ImageByteFormat.png);
-    final uint8List = byteData?.buffer.asUint8List();
+      navigator.overlay!.insert(overlay);
 
-    overlay.remove();
-    return BitmapDescriptor.bytes(uint8List!);
+      // First wait for the overlay to be inserted
+      await Future.delayed(Duration(milliseconds: 50));
+      
+      // Then wait for the widget to be laid out
+      await WidgetsBinding.instance.endOfFrame;
+      
+      // Then wait a bit more for the image to be loaded and rendered
+      await Future.delayed(Duration(milliseconds: 200));
+
+      final boundary = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) {
+        throw Exception('Failed to find RepaintBoundary');
+      }
+
+      final image = await boundary.toImage(pixelRatio: 2.0); 
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      
+      if (byteData == null) {
+        throw Exception('Failed to get byte data from image');
+      }
+
+      final bytes = byteData.buffer.asUint8List();
+      return BitmapDescriptor.bytes(bytes);
+    } catch (e) {
+      debugPrint('Error creating marker bitmap: $e');
+      return BitmapDescriptor.defaultMarker;
+    } finally {
+      overlay.remove();
+    }
   }
+
+
 
   void handleMarkerTap(MarkerModel model) {
     debugPrint('Marker tapped: ${model.id}');
     selectedMarker = model;
     showSidePanel = true;
+    showMultiMarkerPanel = false;
+    notifyListeners();
+  }
+
+  void toggleMultiMarkerPanel() {
+    if (showSidePanel) {
+      closeSidePanel();
+    }
+    showMultiMarkerPanel = !showMultiMarkerPanel;
     notifyListeners();
   }
 
   void closeSidePanel() {
+    selectedMarker = null;
     showSidePanel = false;
+    notifyListeners();
+  }
+
+  void closeMultiMarkerPanel() {
+    showMultiMarkerPanel = false;
     notifyListeners();
   }
 
