@@ -8,7 +8,6 @@ class UIStateController with ChangeNotifier {
   bool _showMultiMarkerPanel = false;
   MarkerModel? _selectedMarker;
   
-  // Getters
   bool get isInteractingWithUI => _isInteractingWithUI;
   bool get showSidePanel => _showSidePanel;
   bool get showMultiMarkerPanel => _showMultiMarkerPanel;

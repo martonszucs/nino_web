@@ -12,6 +12,8 @@ class MarkerController with ChangeNotifier {
   StreamSubscription<List<MarkerModel>>? _markerSubscription;
   final Map<String, Marker> _markers = {};
   List<MarkerModel> allMarkers = [];
+  List<MarkerModel> visibleMarkers = [];
+  LatLngBounds? _currentBounds;
 
   MarkerController({
     required this.context,
@@ -32,8 +34,27 @@ class MarkerController with ChangeNotifier {
     );
   }
 
+  void updateVisibleBounds(LatLngBounds bounds) {
+    _currentBounds = bounds;
+    _updateVisibleMarkers();
+  }
+
+  void _updateVisibleMarkers() {
+    if (_currentBounds == null) {
+      visibleMarkers = allMarkers;
+      return;
+    }
+
+    visibleMarkers = allMarkers.where((marker) {
+      return _currentBounds!.contains(marker.position);
+    }).toList();
+    notifyListeners();
+  }
+
   Future<void> _processNewMarkers(List<MarkerModel> models) async {
     allMarkers = models;
+    _updateVisibleMarkers();
+    
     final newMarkers = <String, Marker>{};
     
     for (final model in models) {

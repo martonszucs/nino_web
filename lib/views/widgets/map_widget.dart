@@ -63,8 +63,28 @@ class _MapWidgetState extends State<MapWidget> {
     if (mounted) setState(() {});
   }
 
-  void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(GoogleMapController controller) async {
     googleMapController = controller;
+    final bounds = await _getVisibleBounds();
+    markerController.updateVisibleBounds(bounds);
+  }
+
+  Future<LatLngBounds> _getVisibleBounds() async {
+    try {
+      final bounds = await googleMapController.getVisibleRegion();
+      return bounds;
+    } catch (e) {
+      // Return default bounds if controller is not ready
+      return LatLngBounds(
+        southwest: const LatLng(-90, -180),
+        northeast: const LatLng(90, 180),
+      );
+    }
+  }
+
+  void _onCameraMove(CameraPosition position) async {
+    final bounds = await _getVisibleBounds();
+    markerController.updateVisibleBounds(bounds);
   }
 
   @override
@@ -92,6 +112,7 @@ class _MapWidgetState extends State<MapWidget> {
                       ),
                       markers: markerController.markers,
                       zoomGesturesEnabled: !(uiStateController.showSidePanel || uiStateController.showMultiMarkerPanel),
+                      onCameraMove: _onCameraMove,
                       onTap: (_) => markerController.handleMapTap(),
                     ),
                     if (uiStateController.showSidePanel &&
@@ -121,7 +142,7 @@ class _MapWidgetState extends State<MapWidget> {
                           onTap: () => uiStateController.startUIInteraction(),
                           child: MultiMarkerPanel(
                             isDesktop: MediaQuery.of(context).size.width >= 600,
-                            markers: markerController.allMarkers,
+                            markers: markerController.visibleMarkers,
                             onMarkerSelected: (marker) => markerController.handleMarkerTap(marker),
                           ),
                         ),
