@@ -69,14 +69,7 @@ class MultiMarkerPanel extends StatelessWidget {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                int crossAxisCount;
-                if (isDesktop && constraints.maxWidth >= 600) {
-                  crossAxisCount = 3;
-                } else if (constraints.maxWidth >= 400) {
-                  crossAxisCount = 2;
-                } else {
-                  crossAxisCount = 1;
-                }
+                int crossAxisCount = constraints.maxWidth >= 400 ? 2 : 1;
 
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

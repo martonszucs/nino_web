@@ -12,7 +12,7 @@ class MarkerController with ChangeNotifier {
   BuildContext? _context;
   MarkerModel? selectedMarker;
   StreamSubscription<List<MarkerModel>>? _markerSubscription;
-  final Map<String, Marker> _markers = {}; // Track markers by ID
+  final Map<String, Marker> _markers = {}; 
   final Map<String, BitmapDescriptor> _cachedIcons = {};
 
   bool showSidePanel = false;
@@ -22,7 +22,6 @@ class MarkerController with ChangeNotifier {
 
   bool get isInteractingWithUI => _isInteractingWithUI;
 
-  // Notify when starting UI interaction
   void startUIInteraction() {
     _isInteractingWithUI = true;
     Future.delayed(Duration(milliseconds: 50), () {
@@ -49,7 +48,7 @@ class MarkerController with ChangeNotifier {
   }
 
   Future<void> _processNewMarkers(List<MarkerModel> models) async {
-    allMarkers = models; // Store all markers
+    allMarkers = models;
     final newMarkers = <String, Marker>{};
     
     for (final model in models) {
@@ -71,7 +70,6 @@ class MarkerController with ChangeNotifier {
   }
 
   Future<BitmapDescriptor> _createMarkerIcon(MarkerModel model) async {
-    // First ensure the image is loaded
     final completer = Completer<ImageInfo>();
     final image = NetworkImage(model.imageUrl);
     image.resolve(ImageConfiguration.empty).addListener(
@@ -90,7 +88,6 @@ class MarkerController with ChangeNotifier {
       return BitmapDescriptor.defaultMarker;
     }
     
-    // Create a new overlay entry
     final key = GlobalKey();
     final overlay = OverlayEntry(
       builder: (_) => Positioned(
@@ -101,7 +98,6 @@ class MarkerController with ChangeNotifier {
           child: RepaintBoundary(
             key: key,
             child: SizedBox(
-              // Reduce the size for the actual marker bitmap
               width: MarkerConstants.markerWidth,
               height: MarkerConstants.markerHeight,
               child: MarkerWidget(
@@ -121,16 +117,10 @@ class MarkerController with ChangeNotifier {
         debugPrint('Overlay not available for marker creation');
         return BitmapDescriptor.defaultMarker;
       }
-
       navigator.overlay!.insert(overlay);
 
-      // First wait for the overlay to be inserted
       await Future.delayed(Duration(milliseconds: 50));
-      
-      // Then wait for the widget to be laid out
       await WidgetsBinding.instance.endOfFrame;
-      
-      // Then wait a bit more for the image to be loaded and rendered
       await Future.delayed(Duration(milliseconds: 200));
 
       final boundary = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -155,8 +145,6 @@ class MarkerController with ChangeNotifier {
     }
   }
 
-
-
   void handleMarkerTap(MarkerModel model) {
     startUIInteraction();
     debugPrint('Marker tapped: ${model.id}');
@@ -169,12 +157,10 @@ class MarkerController with ChangeNotifier {
   void toggleMultiMarkerPanel() {
     startUIInteraction();
     if (showSidePanel || showMultiMarkerPanel) {
-      // If any panel is open, close everything
       selectedMarker = null;
       showSidePanel = false;
       showMultiMarkerPanel = false;
     } else {
-      // If no panel is open, show multi marker panel
       showMultiMarkerPanel = true;
     }
     notifyListeners();
@@ -198,8 +184,6 @@ class MarkerController with ChangeNotifier {
   void handleMapTap() {
     if (_isMapTap || _isInteractingWithUI) return;
     _isMapTap = true;
-    
-    // Add delay to prevent immediate closing when interacting with panels
     Future.delayed(Duration(milliseconds: 50), () {
       if (!_isInteractingWithUI) {
         closeSidePanel();
