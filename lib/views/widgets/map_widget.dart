@@ -7,6 +7,7 @@ import '/core/constants/constants.dart';
 import 'side_panel/side_panel_widget.dart';
 import 'side_panel/multi_marker_panel_widget.dart';
 import '/controllers/marker_controller.dart';
+import '/controllers/ui_state_controller.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({super.key});
@@ -17,10 +18,9 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   final LocationService locationService = LocationService();
-  final MarkerController markerController = MarkerController();
-
+  late UIStateController uiStateController;
+  late MarkerController markerController;
   late GoogleMapController googleMapController;
-
   String? mapStyle;
   LatLng? _center;
   bool _isLoading = true;
@@ -28,10 +28,14 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
+    uiStateController = UIStateController();
+    markerController = MarkerController(
+      context: context,
+      uiStateController: uiStateController,
+    );
     _fetchLocation();
     _loadMapStyle();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      markerController.setContext(context);
       markerController.initMarkerStream();
     });
   }
@@ -73,7 +77,7 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: markerController,
+      animation: Listenable.merge([markerController, uiStateController]),
       builder: (context, _) {
         return Scaffold(
           body: _isLoading
@@ -87,40 +91,38 @@ class _MapWidgetState extends State<MapWidget> {
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
-                      zoomGesturesEnabled: !(markerController.showSidePanel || markerController.showMultiMarkerPanel),
+                      zoomGesturesEnabled: !(uiStateController.showSidePanel || uiStateController.showMultiMarkerPanel),
                       onTap: (_) => markerController.handleMapTap(),
                     ),
-                    if (markerController.showSidePanel &&
-                        markerController.selectedMarker != null)
+                    if (uiStateController.showSidePanel &&
+                        uiStateController.selectedMarker != null)
                       Positioned(
                         top: 20,
                         left: 20,
                         right: MediaQuery.of(context).size.width >= 600 ? null : 20,
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onTapDown: (_) => markerController.startUIInteraction(),
-                          onTap: () => markerController.startUIInteraction(),
+                          onTapDown: (_) => uiStateController.startUIInteraction(),
+                          onTap: () => uiStateController.startUIInteraction(),
                           child: SidePanel(
                             isDesktop: MediaQuery.of(context).size.width >= 600,
-                            selectedMarker: markerController.selectedMarker!,
+                            selectedMarker: uiStateController.selectedMarker!,
                           ),
                         ),
                       ),
-                    if (markerController.showMultiMarkerPanel)
+                    if (uiStateController.showMultiMarkerPanel)
                       Positioned(
                         top: 20,
                         left: 20,
                         right: MediaQuery.of(context).size.width >= 600 ? null : 20,
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onTapDown: (_) => markerController.startUIInteraction(),
-                          onTap: () => markerController.startUIInteraction(),
+                          onTapDown: (_) => uiStateController.startUIInteraction(),
+                          onTap: () => uiStateController.startUIInteraction(),
                           child: MultiMarkerPanel(
                             isDesktop: MediaQuery.of(context).size.width >= 600,
                             markers: markerController.allMarkers,
-                            onMarkerSelected: (marker) {
-                              markerController.handleMarkerTap(marker);
-                            },
+                            onMarkerSelected: (marker) => markerController.handleMarkerTap(marker),
                           ),
                         ),
                       ),
@@ -129,15 +131,15 @@ class _MapWidgetState extends State<MapWidget> {
                       right: 20,
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
-                        onTapDown: (_) => markerController.startUIInteraction(),
-                        onTap: () => markerController.startUIInteraction(),
+                        onTapDown: (_) => uiStateController.startUIInteraction(),
+                        onTap: () => uiStateController.startUIInteraction(),
                         child: FloatingActionButton(
-                          onPressed: () => markerController.toggleMultiMarkerPanel(),
-                          backgroundColor: markerController.showMultiMarkerPanel || markerController.showSidePanel
+                          onPressed: () => uiStateController.toggleMultiMarkerPanel(),
+                          backgroundColor: uiStateController.showMultiMarkerPanel || uiStateController.showSidePanel
                               ? Colors.red
                               : Colors.blue,
                           child: Icon(
-                            markerController.showMultiMarkerPanel || markerController.showSidePanel
+                            uiStateController.showMultiMarkerPanel || uiStateController.showSidePanel
                                 ? Icons.close
                                 : Icons.view_list,
                             color: Colors.white,
