@@ -66,7 +66,7 @@ class _MapWidgetState extends State<MapWidget> {
   void _onMapCreated(GoogleMapController controller) async {
     googleMapController = controller;
     final bounds = await _getVisibleBounds();
-    markerController.updateVisibleBounds(bounds);
+    markerController.updateVisibleBounds(bounds, 11.0);
   }
 
   Future<LatLngBounds> _getVisibleBounds() async {
@@ -74,7 +74,6 @@ class _MapWidgetState extends State<MapWidget> {
       final bounds = await googleMapController.getVisibleRegion();
       return bounds;
     } catch (e) {
-      // Return default bounds if controller is not ready
       return LatLngBounds(
         southwest: const LatLng(-90, -180),
         northeast: const LatLng(90, 180),
@@ -84,7 +83,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   void _onCameraMove(CameraPosition position) async {
     final bounds = await _getVisibleBounds();
-    markerController.updateVisibleBounds(bounds);
+    markerController.updateVisibleBounds(bounds, position.zoom);
   }
 
   @override

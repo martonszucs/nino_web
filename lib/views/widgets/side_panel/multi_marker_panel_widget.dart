@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nino_web/models/category.dart';
 import '/models/marker_model.dart';
+import 'header_row_widget.dart';
+import 'link_row_widget.dart';
 
 class MultiMarkerPanel extends StatelessWidget {
   final bool isDesktop;
@@ -40,35 +42,74 @@ class MultiMarkerPanel extends StatelessWidget {
         children: [
           LayoutBuilder(
             builder: (context, constraints) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/icons/nino.png',
-                    height: 32,
-                    width: 32,
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "Recent Activity",
+              final shouldWrapLinks = constraints.maxWidth < 400;
+              if (!isDesktop) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/icons/nino.png',
+                      height: 32,
+                      width: 32,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Nino!",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.blueAccent,
                         fontFamily: 'ChakraPetch',
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
-              );
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: LinkRow(alignment: Alignment.centerLeft),
+                    ),
+                  ],
+                );
+              } else if (shouldWrapLinks) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HeaderRow(),
+                    SizedBox(height: 8),
+                    LinkRow(alignment: Alignment.centerLeft),
+                  ],
+                );
+              } else {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: HeaderRow()),
+                    LinkRow(alignment: Alignment.centerRight),
+                  ],
+                );
+              }
             },
           ),
           SizedBox(height: 16),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
+                if (markers.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Zoom in to see reports in this area',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          fontFamily: 'ChakraPetch',
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
                 int crossAxisCount = constraints.maxWidth >= 400 ? 2 : 1;
 
                 return GridView.builder(

@@ -7,6 +7,9 @@ import '/core/services/marker_icon_service.dart';
 import '/controllers/ui_state_controller.dart';
 
 class MarkerController with ChangeNotifier {
+  static const int _maxMarkersInPanel = 50;
+  static const double _minZoomLevel = 10.0;
+
   final BuildContext context;
   final UIStateController uiStateController;
   StreamSubscription<List<MarkerModel>>? _markerSubscription;
@@ -14,6 +17,7 @@ class MarkerController with ChangeNotifier {
   List<MarkerModel> allMarkers = [];
   List<MarkerModel> visibleMarkers = [];
   LatLngBounds? _currentBounds;
+  double _currentZoom = 11.0;
 
   MarkerController({
     required this.context,
@@ -22,7 +26,7 @@ class MarkerController with ChangeNotifier {
 
   void initMarkerStream() {
     _markerSubscription?.cancel();
-    
+
     _markerSubscription = SupabaseService.getMarkerStream().listen(
       (markerModels) async {
         await _processNewMarkers(markerModels);
@@ -34,8 +38,9 @@ class MarkerController with ChangeNotifier {
     );
   }
 
-  void updateVisibleBounds(LatLngBounds bounds) {
+  void updateVisibleBounds(LatLngBounds bounds, double zoom) {
     _currentBounds = bounds;
+    _currentZoom = zoom;
     _updateVisibleMarkers();
   }
 
@@ -44,22 +49,27 @@ class MarkerController with ChangeNotifier {
       visibleMarkers = allMarkers;
       return;
     }
-
-    visibleMarkers = allMarkers.where((marker) {
+    if (_currentZoom < _minZoomLevel) {
+      visibleMarkers = [];
+      return;
+    }
+    var filtered = allMarkers.where((marker) {
       return _currentBounds!.contains(marker.position);
     }).toList();
+    filtered.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    visibleMarkers = filtered.take(_maxMarkersInPanel).toList();
     notifyListeners();
   }
 
   Future<void> _processNewMarkers(List<MarkerModel> models) async {
     allMarkers = models;
     _updateVisibleMarkers();
-    
+
     final newMarkers = <String, Marker>{};
-    
+
     for (final model in models) {
       final icon = await MarkerIconService.createMarkerIcon(model, context);
-      
+
       newMarkers[model.id] = Marker(
         markerId: MarkerId(model.id),
         position: model.position,
@@ -67,7 +77,7 @@ class MarkerController with ChangeNotifier {
         onTap: () => handleMarkerTap(model),
       );
     }
-    
+
     _markers
       ..clear()
       ..addAll(newMarkers);
