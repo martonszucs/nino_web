@@ -23,7 +23,7 @@ class MultiMarkerPanel extends StatelessWidget {
     
     return Container(
       width: isDesktop ? screenWidth * 0.33 : screenWidth - 40,
-      height: screenHeight * 0.85,
+      height: screenHeight * 0.90,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
