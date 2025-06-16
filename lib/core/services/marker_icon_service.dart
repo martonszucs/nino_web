@@ -36,8 +36,15 @@ class MarkerIconService {
       final pictureRecorder = ui.PictureRecorder();
       final canvas = Canvas(pictureRecorder);
       
+      // Calculate the main rectangle size (subtract triangle height and account for border)
       final mainRectHeight = MarkerConstants.markerHeight - MarkerConstants.triangleHeight;
-      final markerRect = Rect.fromLTWH(0, 0, MarkerConstants.markerWidth, mainRectHeight);
+      final borderOffset = MarkerConstants.markerBorderWidth / 2;
+      final markerRect = Rect.fromLTWH(
+        borderOffset,
+        borderOffset,
+        MarkerConstants.markerWidth - MarkerConstants.markerBorderWidth,
+        mainRectHeight - MarkerConstants.markerBorderWidth
+      );
       final radius = Radius.circular(MarkerConstants.markerBorderRadius);
       final rrect = RRect.fromRectAndCorners(
         markerRect,
@@ -49,13 +56,16 @@ class MarkerIconService {
       
       // Make triangle path
       final trianglePath = Path();
-      final triangleTop = mainRectHeight; 
-      final triangleLeft = (markerRect.width - MarkerConstants.triangleWidth) / 2;
+      final triangleTop = mainRectHeight - (MarkerConstants.markerBorderWidth / 2);
+      final triangleLeft = (MarkerConstants.markerWidth - MarkerConstants.triangleWidth) / 2;
       
-      trianglePath.moveTo(triangleLeft, triangleTop); 
-      trianglePath.lineTo(triangleLeft + (MarkerConstants.triangleWidth / 2), MarkerConstants.markerHeight); 
-      trianglePath.lineTo(triangleLeft + MarkerConstants.triangleWidth, triangleTop);
-      trianglePath.close(); 
+      trianglePath.moveTo(triangleLeft, triangleTop);  // Start from left point
+      trianglePath.lineTo(
+        triangleLeft + (MarkerConstants.triangleWidth / 2),
+        MarkerConstants.markerHeight - (MarkerConstants.markerBorderWidth / 2)
+      );  // Bottom point
+      trianglePath.lineTo(triangleLeft + MarkerConstants.triangleWidth, triangleTop);  // Right point
+      trianglePath.close();
       
       // Draw and fill triangle
       final trianglePaint = Paint()
@@ -70,13 +80,12 @@ class MarkerIconService {
         ..strokeWidth = MarkerConstants.markerBorderWidth;
       canvas.drawRRect(rrect, backgroundPaint);
       
-      // Calculate image rect with padding for border
-      final padding = MarkerConstants.markerBorderWidth / 2; 
+      // Calculate image rect (should perfectly fit inside the border)
       final imageRect = Rect.fromLTWH(
-        padding,
-        padding,
-        MarkerConstants.markerWidth - (padding * 2),
-        mainRectHeight - (padding * 2)
+        MarkerConstants.markerBorderWidth,
+        MarkerConstants.markerBorderWidth,
+        MarkerConstants.markerWidth - (MarkerConstants.markerBorderWidth * 2),
+        mainRectHeight - (MarkerConstants.markerBorderWidth * 2)
       );
       
       // Create image RRect with same radius as border

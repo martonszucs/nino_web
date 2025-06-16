@@ -7,11 +7,11 @@ class MarkerConstants {
   static const double markerWidth = 72;
   static const double markerHeight = 128;
 
-  static const double markerBorderWidth = 5;
-  static const double markerBorderRadius = 16;
+  static const double markerBorderWidth = 4;
+  static const double markerBorderRadius = 12;
 
-  static const double triangleHeight = 10.0;
-  static const double triangleWidth = 24.0;
+  static const double triangleHeight = 16.0;
+  static const double triangleWidth = 20.0;
 }
 
 class LinkConstants {
