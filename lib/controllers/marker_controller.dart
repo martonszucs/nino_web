@@ -68,7 +68,7 @@ class MarkerController with ChangeNotifier {
     final newMarkers = <String, Marker>{};
 
     for (final model in models) {
-      final icon = await MarkerIconService.createMarkerIcon(model, context);
+      final icon = await MarkerIconService.createMarkerIcon(model);
 
       newMarkers[model.id] = Marker(
         markerId: MarkerId(model.id),
