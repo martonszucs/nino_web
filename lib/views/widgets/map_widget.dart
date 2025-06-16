@@ -110,12 +110,35 @@ class _MapWidgetState extends State<MapWidget> {
                         zoom: 11.0,
                       ),
                       markers: markerController.markers,
-                      zoomGesturesEnabled: !(uiStateController.showSidePanel || uiStateController.showMultiMarkerPanel),
+                      zoomGesturesEnabled: true,
+                      scrollGesturesEnabled: true,
                       onCameraMove: _onCameraMove,
                       onTap: (_) => markerController.handleMapTap(),
                     ),
                     if (uiStateController.showSidePanel &&
-                        uiStateController.selectedMarker != null)
+                        uiStateController.selectedMarker != null)...[
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        right: MediaQuery.of(context).size.width >= 600 ? null : 20,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onPanDown: (_) {},  // Block map pan
+                              onScaleStart: (_) {},  // Block map zoom
+                              child: Container(
+                                width: MediaQuery.of(context).size.width >= 600 
+                                    ? MediaQuery.of(context).size.width * 0.33 
+                                    : null,
+                                height: MediaQuery.of(context).size.height * 0.965,
+                                color: Colors.transparent,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      // Actual panel
                       Positioned(
                         top: 20,
                         left: 20,
@@ -130,7 +153,30 @@ class _MapWidgetState extends State<MapWidget> {
                           ),
                         ),
                       ),
-                    if (uiStateController.showMultiMarkerPanel)
+                    ],
+                    if (uiStateController.showMultiMarkerPanel)...[
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        right: MediaQuery.of(context).size.width >= 600 ? null : 20,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onPanDown: (_) {},  // Block map pan
+                              onScaleStart: (_) {},  // Block map zoom
+                              child: Container(
+                                width: MediaQuery.of(context).size.width >= 600 
+                                    ? MediaQuery.of(context).size.width * 0.33 
+                                    : null,
+                                height: MediaQuery.of(context).size.height * 0.965,
+                                color: Colors.transparent,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      // Actual panel
                       Positioned(
                         top: 20,
                         left: 20,
@@ -147,6 +193,7 @@ class _MapWidgetState extends State<MapWidget> {
                           ),
                         ),
                       ),
+                    ],
                     Positioned(
                       top: 20,
                       right: 20,
