@@ -143,6 +143,7 @@ class _MapWidgetState extends State<MapWidget> {
                             isDesktop: MediaQuery.of(context).size.width >= 600,
                             markers: markerController.visibleMarkers,
                             onMarkerSelected: (marker) => markerController.handleMarkerTap(marker),
+                            currentZoom: markerController.currentZoom,
                           ),
                         ),
                       ),

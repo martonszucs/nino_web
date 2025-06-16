@@ -92,6 +92,7 @@ class MarkerController with ChangeNotifier {
   }
 
   Set<Marker> get markers => _markers.values.toSet();
+  double get currentZoom => _currentZoom;
 
   @override
   void dispose() {

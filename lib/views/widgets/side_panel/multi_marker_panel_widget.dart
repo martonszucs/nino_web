@@ -8,12 +8,15 @@ class MultiMarkerPanel extends StatelessWidget {
   final bool isDesktop;
   final List<MarkerModel> markers;
   final Function(MarkerModel) onMarkerSelected;
+  final double currentZoom;
+  static const double _minZoomLevel = 10.0;
 
   const MultiMarkerPanel({
     super.key,
     required this.isDesktop,
     required this.markers,
     required this.onMarkerSelected,
+    required this.currentZoom,
   });
 
   @override
@@ -98,7 +101,9 @@ class MultiMarkerPanel extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.all(16),
                       child: Text(
-                        'Zoom in to see reports in this area',
+                        currentZoom >= _minZoomLevel 
+                            ? 'No reports in this area yet'
+                            : 'Zoom in to see reports in this area',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
