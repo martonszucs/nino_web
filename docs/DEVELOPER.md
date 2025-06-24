@@ -12,12 +12,12 @@
 
 ## Architektúra áttekintés
 
-A Nino Web alkalmazás a Model-View-Controller (MVC) architektúrát követi, Flutter webes megvalósítással. Ez a struktúra tiszta szétválasztást és jól karbantartható kódbázist biztosít.
+A Nino Web alkalmazás a Model-View-Controller (MVC) architektúrát követi, Flutter webes megvalósítással. Ez a struktúra tiszta szétválasztást, moduláris felépítést és jól karbantartható kódbázist biztosít. Az adatok, a felhasználói felület és az üzleti logika elkülönülten kezelhető, így a fejlesztés és a hibakeresés is átláthatóbb.
 
-### MVC megvalósítás
-- **Modellek**: Adatszerkezetek és üzleti logika
-- **Nézetek**: Felhasználói felület, komponensek és widgetek
-- **Kontrollerek**: Állapotkezelés és üzleti logika koordináció
+### MVC megvalósítás a projektben
+- **Modellek**: Adatszerkezetek, marker és kategória modellek, valamint az ezekhez tartozó adatfeldolgozó logika (pl. Supabase-ből érkező adatok konvertálása)
+- **Nézetek**: Felhasználói felület, vizuális komponensek és widgetek (térkép, oldalsó panelek, marker lista, stb.), amelyek a kontrollerek által biztosított adatokat jelenítik meg
+- **Kontrollerek**: Állapotkezelés, üzleti logika koordináció, felhasználói interakciók kezelése (pl. marker kiválasztás, panelek nyitása/zárása, marker stream figyelése)
 
 ## Projekt struktúra
 
