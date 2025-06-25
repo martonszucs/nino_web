@@ -9,6 +9,7 @@
 - [Kontrollerek](#kontrollerek)
 - [Nézetek](#nézetek)
 - [Beállítás és konfiguráció](#beállítás-és-konfiguráció)
+- [Projekt indítása](#projekt-indítása)
 
 ## Architektúra áttekintés
 
@@ -188,6 +189,23 @@ flutter:
           weight: 700
 ```
 
+## Google Maps API kulcs létrehozása
+
+A projekt futtatásához szükség van egy érvényes Google Maps API kulcsra, amelyet a `.env` fájlban kell megadni.
+
+**Lépések:**
+1. Lépj be a [Google Cloud Console](https://console.cloud.google.com/) felületre.
+2. Hozz létre egy új projektet, vagy válassz ki egy meglévőt.
+3. Navigálj az "APIs & Services" > "Credentials" menüpontra.
+4. Kattints az "+ CREATE CREDENTIALS" gombra, majd válaszd az "API key" opciót.
+5. Az elkészült kulcsot másold be a `.env` fájlba:
+   ```env
+   GOOGLE_MAPS_API_KEY=ide_illeszd_be_a_kulcsot
+   ```
+6. Engedélyezd a "Maps JavaScript API"-t a projektedben az "APIs & Services" > "Library" menüpontban.
+
+További részletek: [Google Maps API kulcs létrehozása - hivatalos dokumentáció](https://developers.google.com/maps/documentation/javascript/get-api-key)
+
 ## Fejlesztési irányelvek
 
 ### Kódstílus
@@ -210,3 +228,27 @@ flutter:
 - Marker renderelés optimalizálása
 - Lusta betöltés használata, ahol lehet
 - Memóriahasználat figyelése nagy adathalmazoknál
+
+## Projekt indítása
+
+1. **Repository klónozása**
+   ```sh
+   git clone <repo-url>
+   cd nino-web
+   ```
+2. **Függőségek telepítése**
+   ```sh
+   flutter pub get
+   ```
+3. **.env fájl létrehozása**
+   - Másold vagy hozd létre a `.env` fájlt a projekt gyökerében a szükséges kulcsokkal (Google Maps API kulcs, Supabase URL, Supabase Anonymous Key).
+4. **Webes fejlesztői szerver indítása**
+   ```sh
+   flutter run -d chrome
+   ```
+5. **Elérhető a böngészőben**
+   - Alapértelmezett cím: [http://localhost:5000](http://localhost:5000) vagy amit a Flutter kiír.
+
+**Megjegyzés:**
+- A Google Maps és Supabase működéséhez érvényes API kulcsok szükségesek.
+- Ha először futtatod, a Flutter SDK-t is telepítened kell: [Flutter telepítési útmutató](https://docs.flutter.dev/get-started/install)
