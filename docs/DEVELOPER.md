@@ -56,6 +56,34 @@ lib/
 - **Flutter SDK**: ^3.8.0-177.0.dev
 - **Dart**: A Flutter SDK-val kompatibilis legfrissebb stabil verzió
 
+## Supabase Integráció
+
+A Nino Web alkalmazás a [Supabase](https://supabase.com/) backend-szolgáltatást (BaaS) használja, amely adatbázis, hitelesítés és tárolási funkciókat biztosít.
+
+### Használt Supabase Szolgáltatások
+
+#### 1. PostgreSQL Adatbázis
+- Tárolja az összes marker adatot, beleértve a koordinátákat, kategóriákat és metaadatokat
+- Fő tábla:
+  - `reports` - Tárolja a földrajzi markereket a következő mezőkkel:
+    - `id` (UUID elsődleges kulcs)
+    - `coordinates` (Koordináták)
+    - `category` (szöveg)
+    - `originator` (UUID, auth.users-ra hivatkozik)
+    - `created_at` (időbélyeg)
+
+#### 2. Tároló (Storage)
+- Marker képeket tárol a következő bucket-ekben:
+  - `news` - Feltöltött marker fotókat tartalmaz
+
+### Konfiguráció
+
+Környezeti változók a `.env` fájlban:
+```env
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+```
+
 ### Főbb függőségek
 - **cupertino_icons**: ^1.0.8 - iOS stílusú ikonok
 - **supabase_flutter**: ^2.8.4 - Backend as a Service (BaaS) integráció
@@ -233,7 +261,7 @@ További részletek: [Google Maps API kulcs létrehozása - hivatalos dokumentá
 
 1. **Repository klónozása**
    ```sh
-   git clone <repo-url>
+   git clone https://github.com/martonszucs/nino_web.git
    cd nino-web
    ```
 2. **Függőségek telepítése**
